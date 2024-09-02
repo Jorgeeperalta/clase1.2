@@ -1,5 +1,5 @@
 {
-  "name": "clase",
+  "name": "VisioNegocios",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,13 +15,14 @@
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
     "vue2-leaflet": "^2.7.0",
+    "vue3-video-play": "^1.3.2",
     "vuetify": "^2.6.0",
     "vuex": "^3.6.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
-    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "^5.0.8",

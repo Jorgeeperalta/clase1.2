@@ -18,6 +18,8 @@
         <br />
         <br />
         <v-btn outlined color="green" @click="traerDatosApi">trer datos desde api</v-btn>
+         <br />
+        <v-btn outlined color="green" @click="traerPasarela">Pasarela</v-btn>
       </v-col>
       {{ comentarios }}
     </v-row>
@@ -47,6 +49,10 @@ export default {
     },
     datos() {
       this.$router.push("/datos");
+      this.$store.state.btnLogin = true;
+    },
+    traerPasarela() {
+      this.$router.push("/pasarela");
       this.$store.state.btnLogin = true;
     },
   },

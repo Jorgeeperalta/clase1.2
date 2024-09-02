@@ -1,19 +1,25 @@
 <template>
+  <v-app>
+  <br><br>
+  <br><br>
+  <br><br>
   <v-data-table
     :headers="headers"
-    :items="desserts"
+    :items="productos"
     sort-by="calories"
     class="elevation-1"
+     item-key="pkproducto"
   >
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>Tabla postres</v-toolbar-title>
+        <v-toolbar-title>Pantallas {{totalPantallas }} de  {{ $store.state.cant_pantallas }}</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-              New Item
+            <v-btn v-if="totalPantallas < $store.state.cant_pantallas" color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
+              Nueva pantalla 
+            
             </v-btn>
           </template>
           <v-card>
@@ -26,32 +32,32 @@
                 <v-row>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.name"
-                      label="Dessert name"
+                      v-model="editedItem.nombre"
+                      label="Nombre"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.calories"
-                      label="Calories"
+                      v-model="editedItem.descripcion"
+                      label="Descripcion"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.fat"
-                      label="Fat (g)"
+                      v-model="editedItem.stock"
+                      label="Stock"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.carbs"
-                      label="Carbs (g)"
+                      v-model="editedItem.precio"
+                      label="Precio"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-text-field
-                      v-model="editedItem.protein"
-                      label="Protein (g)"
+                      v-model="editedItem.cantidad"
+                      label="Cantidad"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -60,20 +66,20 @@
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="close"> Cancel </v-btn>
-              <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+              <v-btn color="blue darken-1" text @click="close"> Cancelar </v-btn>
+              <v-btn color="blue darken-1" text @click="save"> Guardar </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
             <v-card-title class="text-h5"
-              >Are you sure you want to delete this item?</v-card-title
+              >Esta seguro de eliminar este item?</v-card-title
             >
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeDelete"
-                >Cancel</v-btn
+                >Cancelar</v-btn
               >
               <v-btn color="blue darken-1" text @click="deleteItemConfirm"
                 >OK</v-btn
@@ -92,34 +98,45 @@
       <v-btn color="primary" @click="initialize"> Reset </v-btn>
     </template>
   </v-data-table>
+</v-app>
 </template>
   <script>
 export default {
   data: () => ({
+    productos: [],
+    pkproducto: '',
     dialog: false,
     dialogDelete: false,
     headers: [
       {
-        text: "Dessert (100g serving)",
+        text: "Nombre",
         align: "start",
         sortable: false,
-        value: "name",
+        value: "nombre",
       },
-      { text: "Calories", value: "calories" },
-      { text: "Fat (g)", value: "fat" },
-      { text: "Carbs (g)", value: "carbs" },
-      { text: "Protein (g)", value: "protein" },
+      { text: "Descripcion", value: "descripcion" },
+      { text: "Precio", value: "precio" },
+      { text: "Cantidad", value: "cantidad" },
+      { text: "Stock", value: "stock" },
       { text: "Actions", value: "actions", sortable: false },
     ],
-    desserts: [],
+    totalPantallas:'',
     editedIndex: -1,
     editedItem: {
-      name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
+     nombre:'',
+     descripcion:'',
+     precio:'',
+     cantidad:'',
+     stock:''
     },
+    defaultItem: {
+      nombre:'',
+     descripcion:'',
+     precio:'',
+     cantidad:'',
+     stock:''
+    },
+  
     defaultItem: {
       name: "",
       calories: 0,
@@ -131,7 +148,7 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
+      return this.editedIndex === -1 ? "Nueva pantalla" : "Edita pantalla";
     },
   },
 
@@ -145,99 +162,160 @@ export default {
   },
 
   created() {
-    this.initialize();
+   
+    this.traerProductos();
   },
 
   methods: {
-    initialize() {
-      this.desserts = [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-        },
-        {
-          name: "Ice cream sandwich",
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-        },
-        {
-          name: "Eclair",
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-        },
-        {
-          name: "Cupcake",
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-        },
-        {
-          name: "Gingerbread",
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-        },
-        {
-          name: "Jelly bean",
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-        },
-        {
-          name: "Lollipop",
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-        },
-        {
-          name: "Honeycomb",
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-        },
-        {
-          name: "Donut",
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-        },
-        {
-          name: "KitKat",
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-        },
-      ];
-    },
+    crearProducto () {
+      const obj = this
+      var myHeaders = new Headers()
+      myHeaders.append('Authorization', 'Bearer ' + sessionStorage.token + '')
+      myHeaders.append('Content-Type', 'application/json')
 
+      var raw = JSON.stringify({
+        opcion: '1',
+        nombre: this.editedItem.nombre.toUpperCase(),
+        descripcion: this.editedItem.descripcion.toUpperCase(),
+        precio: this.editedItem.precio,
+        cantidad: this.editedItem.cantidad,
+        stock: this.editedItem.stock,
+        id_usuario: parseInt(sessionStorage.userId)
+      })
+
+      
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      }
+
+      var promise = Promise.race([
+        fetch(`${this.$store.state.url}productos.php`, requestOptions)
+          .then(response => response.json()),
+        new Promise((resolve, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 520000)
+        )
+      ])
+
+      promise.then(result => console.log(result))
+      promise.then(alert('Producto agregado correctamente'))
+      promise.catch(error => console.log(error))
+      setTimeout(() => { this.traerProductos() }, 3000)
+    },
+    traerProductos () {
+      //this.$store.state.cant_pantallas
+      var myHeaders = new Headers()
+      myHeaders.append('Authorization', 'Bearer ' + sessionStorage.token + '')
+      var raw = JSON.stringify({
+        id_usuario: sessionStorage.userId,
+        opcion: '2'
+      })
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      }
+
+      var promise = Promise.race([
+        fetch(`${this.$store.state.url}productos.php`, requestOptions)
+          .then(response => response.json()),
+        new Promise((resolve, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 520000)
+        )
+      ])
+      promise.then(result => (this.productos = result))
+      promise.then(result => (this.totalPantallas = result.length))
+      promise.then(result => console.log(result))
+      promise.catch(error => console.log(error))
+    },
+    eliminarProducto () {
+      var myHeaders = new Headers()
+      myHeaders.append('Authorization', 'Bearer ' + sessionStorage.token + '')
+      // myHeaders.append('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlBFUkFMVEEgIE1BUlRJTiIsImV4cCI6MTY2NjcwMjAyN30.zjw1YpvvPJK1B1EH2NPGZ9gUalembdu38fv2zLpD3jI')
+      var raw = JSON.stringify({
+        id: this.pkproducto,
+      })
+      var requestOptions = {
+        method: 'DELETE',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      }
+
+      var promise = Promise.race([
+        fetch(`${this.$store.state.url}productos.php`, requestOptions)
+          .then(response => response.json()),
+        new Promise((resolve, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 520000)
+        )
+      ])
+      promise.then(result => console.log(result))
+      promise.catch(error => console.log(error))
+      setTimeout(() => { this.traerProductos() }, 3000)
+    },
+    editarProducto () {
+      // eslint-disable-next-line no-console
+     
+      
+      const obj = this
+      var myHeaders = new Headers()
+      myHeaders.append('Authorization', 'Bearer ' + sessionStorage.token + '')
+      myHeaders.append('Content-Type', 'application/json')
+
+      var raw = JSON.stringify({
+        id: this.pkproducto,
+        nombre: this.editedItem.nombre.toUpperCase(),
+        descripcion: this.editedItem.descripcion.toUpperCase(),
+        precio: this.editedItem.precio,
+        cantidad: this.editedItem.cantidad,
+        stock: this.editedItem.stock,
+     
+      })
+
+      var requestOptions = {
+        method: 'PUT',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+      }
+
+      var promise = Promise.race([
+        fetch(`${this.$store.state.url}productos.php`, requestOptions)
+          .then(response => response.json()),
+        new Promise((resolve, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), 520000)
+        )
+      ])
+
+      promise.then(result => console.log(result))
+      // promise.then(obj.$swal({
+      //   title: 'Se edito con exito!!',
+      //   text: '',
+      //   icon: 'success'
+      // }))
+      promise.catch(error => console.log(error))
+      setTimeout(() => { this.traerProductos() }, 3000)
+    },
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.pkproducto = item.id
+      this.editedIndex = this.productos.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.pkproducto = item.id
+      this.editedIndex = this.productos.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
     deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
+      this.eliminarProducto()
+      this.productos.splice(this.editedIndex, 1);
       this.closeDelete();
     },
 
@@ -259,9 +337,11 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        this.editarProducto();
+        Object.assign(this.productos[this.editedIndex], this.editedItem);
       } else {
-        this.desserts.push(this.editedItem);
+        this.crearProducto();
+        this.productos.push(this.editedItem);
       }
       this.close();
     },
